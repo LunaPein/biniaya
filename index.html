@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Aya 💚</title>
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(#bde0fe, #a2d2ff);
+}
+
+/* Rainbow Title */
+.title {
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+    background: linear-gradient(90deg, red, orange, yellow, green, blue, violet);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from { filter: drop-shadow(0 0 5px white); }
+    to { filter: drop-shadow(0 0 20px pink); }
+}
+
+/* Ground */
+.ground {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 120px;
+    background: repeating-linear-gradient(
+        45deg,
+        #d4a373,
+        #d4a373 20px,
+        #b08968 20px,
+        #b08968 40px
+    );
+}
+
+/* Smiski-style Character */
+.smiski {
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 100px;
+    background: #caffbf;
+    border-radius: 10px;
+    animation: bounce 2s infinite ease-in-out;
+    cursor: pointer;
+}
+
+.eye {
+    position: absolute;
+    top: 25px;
+    width: 8px;
+    height: 8px;
+    background: black;
+    border-radius: 50%;
+}
+
+.eye.left { left: 15px; }
+.eye.right { right: 15px; }
+
+@keyframes bounce {
+    0%,100% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, -15px); }
+}
+
+/* Secret Message */
+.secret {
+    position: absolute;
+    top: 90px;
+    width: 100%;
+    text-align: center;
+    font-size: 20px;
+    color: #ff70a6;
+    display: none;
+}
+
+/* Hearts (game collectibles) */
+.heart {
+    position: absolute;
+    font-size: 24px;
+}
+
+/* Sparkles */
+.sparkle {
+    position: absolute;
+    font-size: 14px;
+    color: white;
+    animation: sparkle 2s linear infinite;
+}
+
+@keyframes sparkle {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-40px); }
+}
+
+/* Music Button */
+.music-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.score {
+    position: absolute;
+    bottom: 140px;
+    left: 20px;
+    font-size: 18px;
+    color: #333;
+}
+</style>
+</head>
+<body>
+
+<div class="title">Aya 💚 You are gentle magic</div>
+<div class="secret" id="secretMessage">
+    Aya… even on your softest days, you are stronger than the world knows 🌷💚
+</div>
+
+<button class="music-btn" onclick="toggleMusic()">🎵 Music</button>
+<div class="score">Hearts Collected: <span id="score">0</span></div>
+
+<div class="smiski" id="smiski">
+    <div class="eye left"></div>
+    <div class="eye right"></div>
+</div>
+
+<div class="ground"></div>
+
+<audio id="bgMusic" loop>
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8f0b6c7e2.mp3?filename=sweet-dreams-ambient-110397.mp3" type="audio/mp3">
+</audio>
+
+<script>
+let score = 0;
+let jumping = false;
+let smiski = document.getElementById("smiski");
+
+/* Secret message on click */
+smiski.addEventListener("click", () => {
+    document.getElementById("secretMessage").style.display = "block";
+});
+
+/* Music */
+function toggleMusic() {
+    const music = document.getElementById("bgMusic");
+    if (music.paused) {
+        music.play();
+    } else {
+        music.pause();
+    }
+}
+
+/* Jump mini-game */
+document.addEventListener("keydown", function(e) {
+    if (e.code === "Space" && !jumping) {
+        jumping = true;
+        smiski.style.transition = "bottom 0.3s";
+        smiski.style.bottom = "200px";
+        setTimeout(() => {
+            smiski.style.bottom = "120px";
+            setTimeout(() => jumping = false, 300);
+        }, 300);
+    }
+});
+
+/* Spawn hearts */
+function spawnHeart() {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = "💖";
+    heart.style.left = Math.random() * window.innerWidth + "px";
+    heart.style.bottom = "120px";
+    document.body.appendChild(heart);
+
+    const interval = setInterval(() => {
+        let heartRect = heart.getBoundingClientRect();
+        let smiskiRect = smiski.getBoundingClientRect();
+
+        if (
+            heartRect.left < smiskiRect.right &&
+            heartRect.right > smiskiRect.left &&
+            heartRect.top < smiskiRect.bottom &&
+            heartRect.bottom > smiskiRect.top
+        ) {
+            score++;
+            document.getElementById("score").textContent = score;
+            heart.remove();
+            clearInterval(interval);
+        }
+    }, 50);
+
+    setTimeout(() => {
+        heart.remove();
+        clearInterval(interval);
+    }, 4000);
+}
+
+setInterval(spawnHeart, 2000);
+
+/* Sparkles */
+function sparkle() {
+    const spark = document.createElement("div");
+    spark.className = "sparkle";
+    spark.innerHTML = "✨";
+    spark.style.left = Math.random() * window.innerWidth + "px";
+    spark.style.top = Math.random() * window.innerHeight + "px";
+    document.body.appendChild(spark);
+    setTimeout(() => spark.remove(), 2000);
+}
+setInterval(sparkle, 300);
+</script>
+
+</body>
+</html>
